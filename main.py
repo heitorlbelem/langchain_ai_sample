@@ -9,6 +9,7 @@ from langchain_community.vectorstores.faiss import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.documents import Document
+from langchain.chains.retrieval import create_retrieval_chain
 
 load_dotenv()
 
@@ -21,7 +22,7 @@ embeddings = OpenAIEmbeddings()
 text_splitter = RecursiveCharacterTextSplitter()
 documents = text_splitter.split_documents(docs)
 vector = FAISS.from_documents(documents, embeddings)
-
+retriever = vector.as_retriever()
 
 prompt = ChatPromptTemplate.from_template(
   """
@@ -31,10 +32,10 @@ prompt = ChatPromptTemplate.from_template(
   """
 )
 document_chain = create_stuff_documents_chain(llm, prompt)
+retrieval_chain = create_retrieval_chain(retriever, document_chain)
 
-response = document_chain.invoke({
-    "input": "how can langsmith help with testing?",
-    "context": [Document(page_content="langsmith can let you visualize test results")]
+response = retrieval_chain.invoke({
+  "input": "how can langsmith help with testing?"
 })
 
-print(response)
+print(response['answer'])
