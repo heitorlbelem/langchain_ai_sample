@@ -34,7 +34,7 @@ document_chain = create_stuff_documents_chain(llm, prompt)
 
 response = document_chain.invoke({
     "input": "how can langsmith help with testing?",
-    "context": [Document(page_content="langsmith é ruim pra testar")]
+    "context": [Document(page_content="langsmith can let you visualize test results")]
 })
 
 print(response)
